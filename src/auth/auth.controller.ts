@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { CreateUserDto, CreateAdminDto, LoginUserDto } from 'src/dto/user.dto';
 import { AuthService } from './auth.service';
 import { Public } from './decorators/public.decorator';
@@ -15,6 +15,11 @@ export class AuthController {
   @Post('register/admin')
   registerAdmin(@Body() createAdminDto: CreateAdminDto) {
     return this.authService.registerAdmin(createAdminDto);
+  }
+  @Public()
+  @Get('verify/user/:token')
+  verifyUser(@Param() { token }: { token: string }) {
+    return this.authService.verifyUser(token);
   }
   @Public()
   @Post('login')
