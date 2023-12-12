@@ -6,7 +6,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from '../schemas/user.schema';
-import { CreateUserDto, CreateAdminDto, LoginUserDto } from '../dto/user.dto';
+import { CreateUserDto, LoginUserDto } from '../dto/user.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService, TokenExpiredError } from '@nestjs/jwt';
 import { MailService } from 'src/mail/mail.service';
@@ -53,8 +53,8 @@ export class AuthService {
     return await user.save();
   }
 
-  async registerAdmin(createAdminDto: CreateAdminDto) {
-    const { name, lastName, email, password, role } = createAdminDto;
+  async registerAdmin(createAdminDto: CreateUserDto) {
+    const { name, lastName, email, password } = createAdminDto;
     if (!email.endsWith('@soyhenry.com')) {
       throw new ConflictException(
         'Sorry, to be an administrator you must have an authorized domain.',
@@ -73,7 +73,7 @@ export class AuthService {
       lastName,
       email,
       password: hashedPassword,
-      role,
+      role: 'admin',
     });
 
     const payload = { email: admin.email, sub: admin._id, role: admin.role };

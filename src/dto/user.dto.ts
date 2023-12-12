@@ -1,5 +1,4 @@
-import { IsEmail, IsNotEmpty, IsEnum, IsStrongPassword } from 'class-validator';
-import { UserRole } from '../schemas/user.schema';
+import { IsEmail, IsNotEmpty, IsStrongPassword } from 'class-validator';
 
 class CredentialsUserDto {
   @IsNotEmpty()
@@ -22,12 +21,6 @@ export class CreateUserDto extends CredentialsUserDto {
   name: string;
   @IsNotEmpty()
   lastName: string;
-}
-
-export class CreateAdminDto extends CreateUserDto {
-  @IsNotEmpty()
-  @IsEnum(UserRole)
-  role: UserRole;
 }
 
 export class LoginUserDto extends CredentialsUserDto {}
