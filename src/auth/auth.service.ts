@@ -23,10 +23,12 @@ export class AuthService {
   }
 
   async registerUser(createUserDto: CreateUserDto) {
+
     const { email, password } = createUserDto;
     const hashedPassword = await this.hashPassword(password);
 
     const user = new this.userModel({ email, password: hashedPassword });
+    console.log(user)
     return await user.save();
   }
 
@@ -54,7 +56,6 @@ export class AuthService {
         `Sorry, we did not find an account for the mail ${email}`,
       );
     }
-
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
@@ -63,6 +64,7 @@ export class AuthService {
 
     const payload = { email: user.email, sub: user._id, role: user.role };
     const accessToken = await this.jwtService.signAsync(payload);
+    console.log(accessToken)
 
     return { accessToken };
   }
