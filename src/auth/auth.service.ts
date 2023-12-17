@@ -146,4 +146,8 @@ export class AuthService {
 
     return { accessToken };
   }
+
+  async getUserInfo(email: string): Promise<User | null> {
+    return await this.userModel.findOne({ email }).select('-password');
+  }
 }
