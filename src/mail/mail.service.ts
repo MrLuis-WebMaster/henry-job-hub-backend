@@ -11,6 +11,7 @@ export class MailService {
     try {
       await this.mailerService.sendMail({
         to: email,
+        from: process.env.EMAIL_FROM,
         subject: '💛 Bienvenido a HenryJobHub - Verificación de Cuenta',
         template: './confirmationEmailAdmin',
         context: {

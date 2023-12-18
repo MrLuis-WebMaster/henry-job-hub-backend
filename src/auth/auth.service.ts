@@ -106,7 +106,7 @@ export class AuthService {
   async verifyUser(validationToken: string): Promise<boolean> {
     try {
       const decoded = await this.verifyToken(validationToken);
-      const user = await this.userModel.findOne({ validationToken }).exec();
+      const user = await this.userModel.findOne({ validationToken });
 
       if (!user) {
         throw new TokenExpiredError('Token expired/invalid', decoded.exp);
@@ -137,7 +137,13 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    if (!user.isVerified) {
+      throw new UnauthorizedException('You should verify your account');
+    }
+
     const payload = {
+      name: user.name,
+      lastName: user.lastName,
       email: user.email,
       id: user._id,
       role: user.role,
@@ -145,7 +151,10 @@ export class AuthService {
     };
     const accessToken = await this.jwtService.signAsync(payload);
 
-    return { accessToken };
+    return {
+      ...payload,
+      accessToken,
+    };
   }
 
   async getUserInfo(email: string): Promise<User | null> {
