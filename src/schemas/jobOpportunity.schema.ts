@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import mongoose from 'mongoose';
+import { User } from './user.schema';
 
 export enum Careers {
     FullStack = 'FullStack',
@@ -8,13 +10,21 @@ export enum Careers {
 }
 
 export enum Mode {
-
+    Hibrido = 'Hibrido',
+    Remoto = 'Remoto',
+    Presencial = 'Presencial'
 }
 
-@Schema()
+const experienceValidator = (value) => {
+    if(value.length <= 2){
+        return 
+    }
+}
+
+@Schema({timestamps:true})
 export class JobOpportunity extends Document{
 
-    @Prop({enum: Careers})
+    @Prop({enum: Careers, required: true})
     career: string;
 
     @Prop({required: true})
@@ -23,8 +33,13 @@ export class JobOpportunity extends Document{
     @Prop({required: true})
     company: string
     
-    @Prop({required: true})
-    experience: string
+    @Prop({required: true, 
+        validate:{
+            validator: (v: number[]) => v.length <=2,
+            message: 'Numero debe tener como maximo dos elementos'
+        }, 
+    })
+    experience: number[]
 
     @Prop({required: true})
     position:string
@@ -32,11 +47,14 @@ export class JobOpportunity extends Document{
     @Prop({required: true})
     country:string
 
-    @Prop({required: true})
+    @Prop({enum: Mode,required: false, default:null})
     mode: string
 
     @Prop({required: true})
     link: string
+
+    @Prop({type: mongoose.Schema.Types.ObjectId, ref: User.name, required:true})
+    user: User
 }
 
 export const JobOpportunitySchema = SchemaFactory.createForClass(JobOpportunity);
