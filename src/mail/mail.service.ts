@@ -23,4 +23,25 @@ export class MailService {
       console.log(error);
     }
   }
+
+  async sendPasswordResetEmail(
+    email: string,
+    name: string,
+    resetToken: string,
+  ) {
+    try {
+      await this.mailerService.sendMail({
+        to: email,
+        subject: '🔐 Recuperación de Contraseña - HenryJobHub',
+        template: './passwordResetEmail',
+        context: {
+          name,
+          resetToken,
+          emailSupport: process.env.EMAIL_SUPPORT,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }

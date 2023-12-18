@@ -2,6 +2,7 @@ import {
   Injectable,
   ConflictException,
   UnauthorizedException,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -149,5 +150,43 @@ export class AuthService {
 
   async getUserInfo(email: string): Promise<User | null> {
     return await this.userModel.findOne({ email }).select('-password');
+  }
+
+  private async generateValidationToken(email: string): Promise<string> {
+    const payload = { email };
+    return await this.jwtService.signAsync(payload, {
+      secret: process.env.JWT_SECRET,
+      expiresIn: '1d', // Token expires in 1 day
+    });
+  }
+
+  async initiatePasswordReset(email: string): Promise<void> {
+    const user = await this.userModel.findOne({ email }).exec();
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const resetToken = await this.generateValidationToken(email);
+    user.resetPasswordToken = resetToken;
+    await user.save();
+
+    this.mailService.sendPasswordResetEmail(email, user.name, resetToken);
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    const decoded = await this.verifyToken(token);
+    const user = await this.userModel
+      .findOne({ email: decoded.email, resetPasswordToken: token })
+      .exec();
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid or expired token');
+    }
+
+    const hashedPassword = await this.hashPassword(newPassword);
+    user.password = hashedPassword;
+    user.resetPasswordToken = null;
+    await user.save();
   }
 }

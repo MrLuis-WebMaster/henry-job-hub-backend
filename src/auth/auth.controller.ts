@@ -30,4 +30,17 @@ export class AuthController {
   getUserInfo(@Req() req: any) {
     return this.authService.getUserInfo(req.user.email);
   }
+  @Public()
+  @Post('forgot-password')
+  forgotPassword(@Body() { email }: { email: string }) {
+    return this.authService.initiatePasswordReset(email);
+  }
+  @Public()
+  @Post('reset-password/:token')
+  resetPassword(
+    @Param() { token }: { token: string },
+    @Body() { newPassword }: { newPassword: string },
+  ) {
+    return this.authService.resetPassword(token, newPassword);
+  }
 }
