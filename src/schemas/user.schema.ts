@@ -28,6 +28,9 @@ export class User extends Document {
 
   @Prop({ default: null })
   validationToken: string;
+
+  @Prop({ default: null })
+  resetPasswordToken: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

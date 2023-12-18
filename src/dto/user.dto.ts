@@ -21,6 +21,7 @@ export class CreateUserDto extends CredentialsUserDto {
   name: string;
   @IsNotEmpty()
   lastName: string;
+  resetPasswordToken?: string;
 }
 
 export class LoginUserDto extends CredentialsUserDto {}
