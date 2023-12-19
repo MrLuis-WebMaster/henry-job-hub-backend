@@ -26,7 +26,6 @@ export class AuthService {
   }
 
   async registerUser(createUserDto: CreateUserDto) {
-
     const { name, lastName, email, password } = createUserDto;
 
     const existingUser = await this.userModel.findOne({ email }).exec();
@@ -150,7 +149,7 @@ export class AuthService {
       isVerified: user.isVerified,
     };
     const accessToken = await this.jwtService.signAsync(payload);
-    console.log(accessToken)
+    console.log(accessToken);
 
     return {
       ...payload,

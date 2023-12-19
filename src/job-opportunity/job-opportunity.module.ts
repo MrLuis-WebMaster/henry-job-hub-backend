@@ -7,20 +7,15 @@ import { JobOpportunity } from 'src/schemas/jobOpportunity.schema';
 import { JobOpportunitySchema } from 'src/schemas/jobOpportunity.schema';
 import { User, UserSchema } from 'src/schemas/user.schema';
 
-
 @Module({
   imports: [
     ConfigModule.forRoot(),
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
-      { name: JobOpportunity.name, schema: JobOpportunitySchema }
+      { name: JobOpportunity.name, schema: JobOpportunitySchema },
     ]),
   ],
-  controllers: [
-    JobOpportunityController
-  ],
-  providers: [
-    JobOpportunityService
-  ],
+  controllers: [JobOpportunityController],
+  providers: [JobOpportunityService],
 })
 export class JobOpportunityModule {}
