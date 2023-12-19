@@ -149,7 +149,6 @@ export class AuthService {
       isVerified: user.isVerified,
     };
     const accessToken = await this.jwtService.signAsync(payload);
-    console.log(accessToken);
 
     return {
       ...payload,
