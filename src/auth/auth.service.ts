@@ -26,6 +26,7 @@ export class AuthService {
   }
 
   async registerUser(createUserDto: CreateUserDto) {
+
     const { name, lastName, email, password } = createUserDto;
 
     const existingUser = await this.userModel.findOne({ email }).exec();
@@ -130,7 +131,6 @@ export class AuthService {
         `Sorry, we did not find an account for the mail ${email}`,
       );
     }
-
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
@@ -150,6 +150,7 @@ export class AuthService {
       isVerified: user.isVerified,
     };
     const accessToken = await this.jwtService.signAsync(payload);
+    console.log(accessToken)
 
     return {
       ...payload,
