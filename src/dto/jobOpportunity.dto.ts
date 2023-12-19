@@ -63,4 +63,6 @@ export class JobOpportunityDto {
 export class UpdateJobOpportunityDto extends PartialType(JobOpportunityDto) {
   @IsOptional()
   career?: string;
+  @IsOptional()
+  visible?: boolean;
 }

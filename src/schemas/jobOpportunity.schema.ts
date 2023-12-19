@@ -46,6 +46,9 @@ export class JobOpportunity extends Document {
   @Prop({ required: true })
   link: string;
 
+  @Prop({ required: true })
+  visible: boolean;
+
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: User.name,

@@ -21,7 +21,6 @@ export const FilteringParams = createParamDecorator(
   (data, exec: ExecutionContext): Filtering[] => {
     const req: Request = exec.switchToHttp().getRequest();
     let filters = req.query.filter as string[];
-    console.log('papa ', req.query);
     if (!filters) return null;
     filters = Array.isArray(filters) ? filters : [filters];
 

@@ -7,6 +7,7 @@ import {
 import { Public } from 'src/auth/decorators/public.decorator';
 import { SortingParams, Sorting } from './decorators/sorting.decorator';
 import { Filtering, FilteringParams } from './decorators/filter.decorator';
+import { Role } from 'src/auth/decorators/role.decorator';
 
 @Controller('job-opportunity')
 export class JobOpportunityController {
@@ -38,6 +39,27 @@ export class JobOpportunityController {
     return this.jobOpportunityService.filterAndFind(sort, filter);
   }
 
+  @Role('admin')
+  @Get('/pending-jobs')
+  findAllPendingJobs(
+    @SortingParams(['country', 'company', 'createdAt']) sort?: Sorting,
+    @FilteringParams([
+      'country',
+      'company',
+      'user',
+      'yearsOfexperience',
+      'mode',
+      'createdAt',
+    ])
+    filter?: Filtering[],
+  ) {
+    if (!sort && !filter) {
+      return this.jobOpportunityService.findAllPendingJobs();
+    }
+
+    return this.jobOpportunityService.filterAndFindPendingJobs(sort, filter);
+  }
+
   @Public()
   @Get(':id')
   findOne(@Param('id') id: string) {
@@ -46,6 +68,15 @@ export class JobOpportunityController {
 
   @Put(':id')
   update(
+    @Param('id') id: string,
+    @Body() updateJobOpportunityDto: UpdateJobOpportunityDto,
+  ) {
+    return this.jobOpportunityService.update(id, updateJobOpportunityDto);
+  }
+
+  @Role('admin')
+  @Put('/update-job/:id')
+  updateAdmin(
     @Param('id') id: string,
     @Body() updateJobOpportunityDto: UpdateJobOpportunityDto,
   ) {
