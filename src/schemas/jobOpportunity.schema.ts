@@ -4,14 +4,14 @@ import mongoose from 'mongoose';
 import { User } from './user.schema';
 
 export enum Careers {
-  FullStack = 'FullStack',
+  FullStack = 'Full Stack',
   DataScience = 'Data Science',
 }
 
 export enum Mode {
-  Hibrido = 'Hibrido',
-  Remoto = 'Remoto',
-  Presencial = 'Presencial',
+  Hybrid = 'Hibrido',
+  Remote = 'Remoto',
+  Presential = 'Presencial',
 }
 
 @Schema({ timestamps: true })
@@ -29,7 +29,7 @@ export class JobOpportunity extends Document {
     required: true,
     validate: {
       validator: (v: number[]) => v.length <= 2,
-      message: 'Numero debe tener como maximo dos elementos',
+      message: 'Number must have a maximum of two elements',
     },
   })
   experience: number[];
