@@ -28,7 +28,7 @@ export class MailService {
   async sendPasswordResetEmail(
     email: string,
     name: string,
-    resetToken: string,
+    resetTokenUrl: string,
   ) {
     try {
       await this.mailerService.sendMail({
@@ -37,7 +37,7 @@ export class MailService {
         template: './passwordResetEmail',
         context: {
           name,
-          resetToken,
+          resetTokenUrl,
           emailSupport: process.env.EMAIL_SUPPORT,
         },
       });

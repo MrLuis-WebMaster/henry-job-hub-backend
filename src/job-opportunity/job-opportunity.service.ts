@@ -11,6 +11,10 @@ import { getSort } from './helpers/sort.helper';
 import { Filtering } from './decorators/filter.decorator';
 import { getFilters } from './helpers/filter.helper';
 import { User } from 'src/schemas/user.schema';
+import {
+  PaginationInfo,
+  PaginationOptions,
+} from 'src/utils/pagination/interface/pagination.interface';
 
 @Injectable()
 export class JobOpportunityService {
@@ -51,23 +55,68 @@ export class JobOpportunityService {
     }
   }
 
-  async findAll(): Promise<JobOpportunity[]> {
+  async findAll(
+    pagination: PaginationOptions,
+  ): Promise<{ data: JobOpportunity[]; pagination: PaginationInfo }> {
     try {
+      const { page, pageSize } = pagination;
+      const skip = (page - 1) * pageSize;
+
+      const totalDocuments = await this.jobOpportunityModule.countDocuments({
+        visible: true,
+      });
+
       const JobOpportunities = await this.jobOpportunityModule
         .find({ visible: true })
+        .skip(skip)
+        .limit(pageSize)
         .exec();
-      return JobOpportunities;
+
+      const totalPages = Math.ceil(totalDocuments / pageSize);
+
+      const paginationInfo: PaginationInfo = {
+        totalDocuments,
+        totalPages,
+        currentPage: page,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+      };
+
+      return { data: JobOpportunities, pagination: paginationInfo };
     } catch (error) {
       throw new UnauthorizedException(error);
     }
   }
 
-  async findAllPendingJobs(): Promise<JobOpportunity[]> {
+  async findAllPendingJobs(
+    pagination: PaginationOptions,
+  ): Promise<{ data: JobOpportunity[]; pagination: PaginationInfo }> {
     try {
+      const { page, pageSize } = pagination;
+
+      const skip = (page - 1) * pageSize;
+
+      const totalDocuments = await this.jobOpportunityModule.countDocuments({
+        visible: false,
+      });
+
       const JobOpportunities = await this.jobOpportunityModule
         .find({ visible: false })
+        .skip(skip)
+        .limit(pageSize)
         .exec();
-      return JobOpportunities;
+
+      const totalPages = Math.ceil(totalDocuments / pageSize);
+
+      const paginationInfo: PaginationInfo = {
+        totalDocuments,
+        totalPages,
+        currentPage: page,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+      };
+
+      return { data: JobOpportunities, pagination: paginationInfo };
     } catch (error) {
       throw new UnauthorizedException(error);
     }
@@ -76,35 +125,72 @@ export class JobOpportunityService {
   async filterAndFindPendingJobs(
     sort?: Sorting,
     filters?: Filtering[],
-  ): Promise<JobOpportunity[]> {
+    pagination?: PaginationOptions,
+  ): Promise<{ data: JobOpportunity[]; pagination: PaginationInfo }> {
     try {
+      const { page, pageSize } = pagination;
       const order: { [key: string]: any } = getSort(sort);
       const where = { ...getFilters(filters), visible: false };
-      console.log(where);
+      const skip = (page - 1) * pageSize;
+
+      const totalDocuments =
+        await this.jobOpportunityModule.countDocuments(where);
+
       const JobOpportunities = await this.jobOpportunityModule
         .find(where)
         .sort(order)
+        .skip(skip)
+        .limit(pageSize)
         .exec();
 
-      return JobOpportunities;
+      const totalPages = Math.ceil(totalDocuments / pageSize);
+
+      const paginationInfo: PaginationInfo = {
+        totalDocuments,
+        totalPages,
+        currentPage: page,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+      };
+
+      return { data: JobOpportunities, pagination: paginationInfo };
     } catch (error) {
       throw new UnauthorizedException(error);
     }
   }
+
   async filterAndFind(
     sort?: Sorting,
     filters?: Filtering[],
-  ): Promise<JobOpportunity[]> {
+    pagination?: PaginationOptions,
+  ): Promise<{ data: JobOpportunity[]; pagination: PaginationInfo }> {
     try {
+      const { page, pageSize } = pagination;
       const order: { [key: string]: any } = getSort(sort);
       const where = { ...getFilters(filters), visible: true };
-      console.log(where);
+      const skip = (page - 1) * pageSize;
+
+      const totalDocuments =
+        await this.jobOpportunityModule.countDocuments(where);
+
       const JobOpportunities = await this.jobOpportunityModule
         .find(where)
         .sort(order)
+        .skip(skip)
+        .limit(pageSize)
         .exec();
 
-      return JobOpportunities;
+      const totalPages = Math.ceil(totalDocuments / pageSize);
+
+      const paginationInfo: PaginationInfo = {
+        totalDocuments,
+        totalPages,
+        currentPage: page,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+      };
+
+      return { data: JobOpportunities, pagination: paginationInfo };
     } catch (error) {
       throw new UnauthorizedException(error);
     }

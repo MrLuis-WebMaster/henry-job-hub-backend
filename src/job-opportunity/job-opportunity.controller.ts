@@ -8,6 +8,8 @@ import { Public } from 'src/auth/decorators/public.decorator';
 import { SortingParams, Sorting } from './decorators/sorting.decorator';
 import { Filtering, FilteringParams } from './decorators/filter.decorator';
 import { Role } from 'src/auth/decorators/role.decorator';
+import { PaginationOptions } from 'src/utils/pagination/interface/pagination.interface';
+import { PaginationParams } from 'src/utils/pagination/decorators/pagination.decorator';
 
 @Controller('job-opportunity')
 export class JobOpportunityController {
@@ -21,6 +23,7 @@ export class JobOpportunityController {
   @Public()
   @Get()
   findAll(
+    @PaginationParams() pagination: PaginationOptions,
     @SortingParams(['country', 'company', 'createdAt']) sort?: Sorting,
     @FilteringParams([
       'country',
@@ -33,15 +36,16 @@ export class JobOpportunityController {
     filter?: Filtering[],
   ) {
     if (!sort && !filter) {
-      return this.jobOpportunityService.findAll();
+      return this.jobOpportunityService.findAll(pagination);
     }
 
-    return this.jobOpportunityService.filterAndFind(sort, filter);
+    return this.jobOpportunityService.filterAndFind(sort, filter, pagination);
   }
 
   @Role('admin')
   @Get('/pending-jobs')
   findAllPendingJobs(
+    @PaginationParams() pagination: PaginationOptions,
     @SortingParams(['country', 'company', 'createdAt']) sort?: Sorting,
     @FilteringParams([
       'country',
@@ -54,10 +58,14 @@ export class JobOpportunityController {
     filter?: Filtering[],
   ) {
     if (!sort && !filter) {
-      return this.jobOpportunityService.findAllPendingJobs();
+      return this.jobOpportunityService.findAllPendingJobs(pagination);
     }
 
-    return this.jobOpportunityService.filterAndFindPendingJobs(sort, filter);
+    return this.jobOpportunityService.filterAndFindPendingJobs(
+      sort,
+      filter,
+      pagination,
+    );
   }
 
   @Public()

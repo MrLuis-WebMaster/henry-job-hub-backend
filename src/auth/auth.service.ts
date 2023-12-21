@@ -179,7 +179,9 @@ export class AuthService {
     user.resetPasswordToken = resetToken;
     await user.save();
 
-    this.mailService.sendPasswordResetEmail(email, user.name, resetToken);
+    const url = `${process.env.URL_RESET_PASSWORD}?token=${resetToken}`;
+
+    this.mailService.sendPasswordResetEmail(email, user.name, url);
   }
 
   async resetPassword(token: string, newPassword: string): Promise<void> {
