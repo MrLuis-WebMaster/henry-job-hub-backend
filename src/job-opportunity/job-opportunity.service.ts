@@ -1,4 +1,9 @@
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import {
   FilterOptionsDto,
   JobOpportunityDto,
@@ -197,6 +202,22 @@ export class JobOpportunityService {
       return jobOpportunity;
     } catch (error) {
       throw new UnauthorizedException(error);
+    }
+  }
+
+  async delete(id: string): Promise<boolean> {
+    try {
+      const deletedJob = await this.jobOpportunityModule
+        .findByIdAndDelete(id)
+        .exec();
+
+      if (!deletedJob) {
+        throw new NotFoundException('Job opportunity not found');
+      }
+
+      return true;
+    } catch (error) {
+      throw new NotFoundException('Job opportunity not found');
     }
   }
 
