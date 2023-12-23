@@ -1,10 +1,15 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import {
+  FilterOptionsDto,
   JobOpportunityDto,
   UpdateJobOpportunityDto,
 } from '../dto/jobOpportunity.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { JobOpportunity } from 'src/schemas/jobOpportunity.schema';
+import {
+  Careers,
+  JobOpportunity,
+  Mode,
+} from 'src/schemas/jobOpportunity.schema';
 import { Model } from 'mongoose';
 import { Sorting } from './decorators/sorting.decorator';
 import { getSort } from './helpers/sort.helper';
@@ -241,5 +246,38 @@ export class JobOpportunityService {
     } catch (error) {
       throw new UnauthorizedException(error);
     }
+  }
+
+  async getFilterOptions(): Promise<FilterOptionsDto> {
+    const companies = await this.jobOpportunityModule
+      .find({ visible: true })
+      .select('company')
+      .distinct('company')
+      .exec();
+
+    const countries = await this.jobOpportunityModule
+      .find({ visible: true })
+      .select('country')
+      .distinct('country')
+      .exec();
+
+    const positions = await this.jobOpportunityModule
+      .find({ visible: true })
+      .select('position')
+      .distinct('position')
+      .exec();
+
+    const careers: string[] = Object.values(Careers);
+    const modes: string[] = Object.values(Mode);
+
+    const data = {
+      companies,
+      countries,
+      positions,
+      careers,
+      modes,
+    };
+
+    return data;
   }
 }

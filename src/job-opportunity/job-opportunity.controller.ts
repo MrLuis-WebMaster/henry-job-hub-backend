@@ -90,4 +90,10 @@ export class JobOpportunityController {
   ) {
     return this.jobOpportunityService.update(id, updateJobOpportunityDto);
   }
+
+  @Public()
+  @Get('/filter/options')
+  getFilterOptions() {
+    return this.jobOpportunityService.getFilterOptions();
+  }
 }
