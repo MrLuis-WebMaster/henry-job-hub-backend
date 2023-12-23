@@ -36,10 +36,15 @@ export class JobOpportunityController {
     filter?: Filtering[],
   ) {
     if (!sort && !filter) {
-      return this.jobOpportunityService.findAll(pagination);
+      return this.jobOpportunityService.findAll(pagination, true);
     }
 
-    return this.jobOpportunityService.filterAndFind(sort, filter, pagination);
+    return this.jobOpportunityService.filterAndFind(
+      sort,
+      filter,
+      pagination,
+      true,
+    );
   }
 
   @Role('admin')
@@ -58,13 +63,14 @@ export class JobOpportunityController {
     filter?: Filtering[],
   ) {
     if (!sort && !filter) {
-      return this.jobOpportunityService.findAllPendingJobs(pagination);
+      return this.jobOpportunityService.findAll(pagination, false);
     }
 
-    return this.jobOpportunityService.filterAndFindPendingJobs(
+    return this.jobOpportunityService.filterAndFind(
       sort,
       filter,
       pagination,
+      false,
     );
   }
 
@@ -89,5 +95,11 @@ export class JobOpportunityController {
     @Body() updateJobOpportunityDto: UpdateJobOpportunityDto,
   ) {
     return this.jobOpportunityService.update(id, updateJobOpportunityDto);
+  }
+
+  @Public()
+  @Get('/filter/options')
+  getFilterOptions() {
+    return this.jobOpportunityService.getFilterOptions();
   }
 }

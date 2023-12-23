@@ -20,9 +20,6 @@ export class JobOpportunity extends Document {
   career: string;
 
   @Prop({ required: true })
-  category: string;
-
-  @Prop({ required: true })
   company: string;
 
   @Prop({
