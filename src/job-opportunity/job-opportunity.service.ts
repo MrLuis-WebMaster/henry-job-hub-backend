@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import {
   FilterOptionsDto,
   JobOpportunityDto,
@@ -20,6 +20,8 @@ import {
   PaginationInfo,
   PaginationOptions,
 } from 'src/utils/pagination/interface/pagination.interface';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class JobOpportunityService {
@@ -27,6 +29,7 @@ export class JobOpportunityService {
     @InjectModel(JobOpportunity.name)
     private jobOpportunityModule: Model<JobOpportunity>,
     @InjectModel(User.name) private userModel: Model<User>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async create(
@@ -66,6 +69,15 @@ export class JobOpportunityService {
   ): Promise<{ data: JobOpportunity[]; pagination: PaginationInfo }> {
     try {
       const { page, pageSize } = pagination;
+      const jobsCacheKey = `jobs-find-adll-${visible}-${page}-${pageSize}`;
+
+      const cachedJobs: { data: JobOpportunity[]; pagination: PaginationInfo } =
+        await this.cacheManager.get(jobsCacheKey);
+
+      if (cachedJobs) {
+        return cachedJobs;
+      }
+
       const skip = (page - 1) * pageSize;
 
       const totalDocuments = await this.jobOpportunityModule.countDocuments({
@@ -88,7 +100,12 @@ export class JobOpportunityService {
         hasPrevPage: page > 1,
       };
 
-      return { data: JobOpportunities, pagination: paginationInfo };
+      const data = {
+        data: JobOpportunities,
+        pagination: paginationInfo,
+      };
+      await this.cacheManager.set(jobsCacheKey, data, 1000 * 60);
+      return data;
     } catch (error) {
       throw new UnauthorizedException(error);
     }
@@ -126,7 +143,11 @@ export class JobOpportunityService {
         hasPrevPage: page > 1,
       };
 
-      return { data: JobOpportunities, pagination: paginationInfo };
+      const data = {
+        data: JobOpportunities,
+        pagination: paginationInfo,
+      };
+      return data;
     } catch (error) {
       throw new UnauthorizedException(error);
     }
