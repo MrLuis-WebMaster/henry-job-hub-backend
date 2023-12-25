@@ -74,15 +74,7 @@ export class JobOpportunityService {
   ): Promise<{ data: JobOpportunity[]; pagination: PaginationInfo }> {
     try {
       const { page, pageSize } = pagination;
-      const jobsCacheKey = `jobs-find-adll-${visible}-${page}-${pageSize}`;
-
-      const cachedJobs: { data: JobOpportunity[]; pagination: PaginationInfo } =
-        await this.cacheManager.get(jobsCacheKey);
-
-      if (cachedJobs) {
-        return cachedJobs;
-      }
-
+ 
       const skip = (page - 1) * pageSize;
 
       const totalDocuments = await this.jobOpportunityModule.countDocuments({
@@ -109,7 +101,6 @@ export class JobOpportunityService {
         data: JobOpportunities,
         pagination: paginationInfo,
       };
-      await this.cacheManager.set(jobsCacheKey, data, 1000 * 60);
       return data;
     } catch (error) {
       throw new UnauthorizedException(error);
