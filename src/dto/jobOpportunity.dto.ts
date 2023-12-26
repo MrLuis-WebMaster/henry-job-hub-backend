@@ -29,9 +29,6 @@ export class JobOpportunityDto {
   career: string;
 
   @IsString()
-  category: string;
-
-  @IsString()
   company: string;
 
   @IsArray()

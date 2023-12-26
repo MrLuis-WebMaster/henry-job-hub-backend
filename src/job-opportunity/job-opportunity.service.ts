@@ -27,6 +27,7 @@ import {
 } from 'src/utils/pagination/interface/pagination.interface';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import { SavedJob } from 'src/schemas/savedJob.schema';
 
 @Injectable()
 export class JobOpportunityService {
@@ -34,6 +35,7 @@ export class JobOpportunityService {
     @InjectModel(JobOpportunity.name)
     private jobOpportunityModule: Model<JobOpportunity>,
     @InjectModel(User.name) private userModel: Model<User>,
+    @InjectModel(SavedJob.name) private savedJobModel: Model<SavedJob>,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
@@ -74,7 +76,7 @@ export class JobOpportunityService {
   ): Promise<{ data: JobOpportunity[]; pagination: PaginationInfo }> {
     try {
       const { page, pageSize } = pagination;
- 
+
       const skip = (page - 1) * pageSize;
 
       const totalDocuments = await this.jobOpportunityModule.countDocuments({
@@ -162,12 +164,38 @@ export class JobOpportunityService {
     }
   }
 
-  async findCreatedByUser(idUser: string): Promise<JobOpportunity[]> {
+  async findCreatedByUser(
+    idUser: string,
+    pagination: PaginationOptions,
+  ): Promise<{ data: JobOpportunity[]; pagination: PaginationInfo }> {
     try {
-      const jobOpportunities = await this.jobOpportunityModule.find({
+      const { page, pageSize } = pagination;
+      const skip = (page - 1) * pageSize;
+      const totalDocuments = await this.jobOpportunityModule.countDocuments({
         user: idUser,
       });
-      return jobOpportunities;
+      const jobOpportunities = await this.jobOpportunityModule
+        .find({
+          user: idUser,
+        })
+        .skip(skip)
+        .limit(pageSize)
+        .exec();
+
+      const totalPages = Math.ceil(totalDocuments / pageSize);
+
+      const paginationInfo: PaginationInfo = {
+        totalDocuments,
+        totalPages,
+        currentPage: page,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+      };
+      const data = {
+        data: jobOpportunities,
+        pagination: paginationInfo,
+      };
+      return data;
     } catch (error) {
       throw new UnauthorizedException(error);
     }
@@ -243,5 +271,68 @@ export class JobOpportunityService {
     };
 
     return data;
+  }
+
+  async saveJob(userId: string, jobId: string): Promise<SavedJob> {
+    const savedJob = new this.savedJobModel({ userId, jobId });
+    return savedJob.save();
+  }
+
+  async deleteJobSaved(userId: string, jobId: string): Promise<boolean> {
+    const result = await this.savedJobModel
+      .findOneAndDelete({ userId, jobId })
+      .exec();
+
+    if (!result) {
+      throw new NotFoundException('Saved job not found');
+    }
+    return true;
+  }
+
+  async getSavedJobs(
+    userId: string,
+    paginationOptions: PaginationOptions,
+  ): Promise<{ data: JobOpportunity[]; pagination: PaginationInfo }> {
+    try {
+      const { page, pageSize } = paginationOptions;
+
+      const skip = (page - 1) * pageSize;
+
+      const savedJobs = await this.savedJobModel
+        .find({ userId })
+        .skip(skip)
+        .limit(pageSize)
+        .exec();
+
+      const jobIds = savedJobs.map((savedJob) => savedJob.jobId);
+
+      const totalDocuments = await this.jobOpportunityModule.countDocuments({
+        _id: { $in: jobIds },
+      });
+
+      const jobOpportunities = await this.jobOpportunityModule
+        .find({ _id: { $in: jobIds } })
+        .skip(skip)
+        .limit(pageSize)
+        .exec();
+
+      const totalPages = Math.ceil(totalDocuments / pageSize);
+
+      const paginationInfo: PaginationInfo = {
+        totalDocuments,
+        totalPages,
+        currentPage: page,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+      };
+
+      const data = {
+        data: jobOpportunities,
+        pagination: paginationInfo,
+      };
+      return data;
+    } catch (error) {
+      throw new NotFoundException(error.message);
+    }
   }
 }
