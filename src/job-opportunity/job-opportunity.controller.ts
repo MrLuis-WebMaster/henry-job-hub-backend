@@ -6,6 +6,7 @@ import {
   Param,
   Put,
   Delete,
+  Req,
 } from '@nestjs/common';
 import { JobOpportunityService } from './job-opportunity.service';
 import {
@@ -115,5 +116,34 @@ export class JobOpportunityController {
   @Get('/filter/options')
   getFilterOptions() {
     return this.jobOpportunityService.getFilterOptions();
+  }
+
+  @Post('/saved/job/:jobId')
+  savedJob(@Req() req: any, @Param('jobId') jobId: string) {
+    return this.jobOpportunityService.saveJob(req.user.id, jobId);
+  }
+
+  @Delete('/delete-saved/job/:jobId')
+  deleteSavedJob(@Req() req: any, @Param('jobId') jobId: string) {
+    return this.jobOpportunityService.deleteJobSaved(req.user.id, jobId);
+  }
+
+  @Get('/saved/jobs')
+  getSavedJobs(
+    @Req() req: any,
+    @PaginationParams() pagination: PaginationOptions,
+  ) {
+    return this.jobOpportunityService.getSavedJobs(req.user.id, pagination);
+  }
+
+  @Get('/created/user')
+  getJobsCreatedByUser(
+    @Req() req: any,
+    @PaginationParams() pagination: PaginationOptions,
+  ) {
+    return this.jobOpportunityService.findCreatedByUser(
+      req.user.id,
+      pagination,
+    );
   }
 }
