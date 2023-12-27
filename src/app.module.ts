@@ -6,6 +6,7 @@ import { JobOpportunityModule } from './job-opportunity/job-opportunity.module';
 import { MailModule } from './mail/mail.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-yet';
+import { JobReportModule } from './job-report/job-report.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { redisStore } from 'cache-manager-redis-yet';
     JobOpportunityModule,
     AuthModule,
     MailModule,
+    JobReportModule,
   ],
   controllers: [],
   providers: [],

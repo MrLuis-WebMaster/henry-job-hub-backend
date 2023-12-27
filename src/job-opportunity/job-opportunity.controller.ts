@@ -128,6 +128,11 @@ export class JobOpportunityController {
     return this.jobOpportunityService.deleteJobSaved(req.user.id, jobId);
   }
 
+  @Get('/saved/favorite/:jobId')
+  isJobSavedAsFavorite(@Req() req: any, @Param('jobId') jobId: string) {
+    return this.jobOpportunityService.isJobSavedAsFavorite(req.user.id, jobId);
+  }
+
   @Get('/saved/jobs')
   getSavedJobs(
     @Req() req: any,
