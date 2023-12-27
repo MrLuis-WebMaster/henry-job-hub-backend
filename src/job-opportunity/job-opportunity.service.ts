@@ -28,6 +28,7 @@ import {
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { SavedJob } from 'src/schemas/savedJob.schema';
+import { JobReport } from 'src/schemas/reportJob.schema';
 
 @Injectable()
 export class JobOpportunityService {
@@ -35,6 +36,7 @@ export class JobOpportunityService {
     @InjectModel(JobOpportunity.name)
     private jobOpportunityModule: Model<JobOpportunity>,
     @InjectModel(User.name) private userModel: Model<User>,
+    @InjectModel(JobReport.name) private jobReportModel: Model<JobReport>,
     @InjectModel(SavedJob.name) private savedJobModel: Model<SavedJob>,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
@@ -234,6 +236,8 @@ export class JobOpportunityService {
         throw new NotFoundException('Job opportunity not found');
       }
 
+      await this.jobReportModel.deleteMany({ jobId: id }).exec();
+
       return true;
     } catch (error) {
       throw new NotFoundException('Job opportunity not found');
@@ -279,6 +283,11 @@ export class JobOpportunityService {
   }
 
   async deleteJobSaved(userId: string, jobId: string): Promise<boolean> {
+    const keyJobSaved = `keyJobSaved-${userId}-${jobId}`;
+    const cacheData = await this.cacheManager.get<boolean>(keyJobSaved);
+    if (cacheData) {
+      await this.cacheManager.del(keyJobSaved);
+    }
     const result = await this.savedJobModel
       .findOneAndDelete({ userId, jobId })
       .exec();
@@ -287,6 +296,20 @@ export class JobOpportunityService {
       throw new NotFoundException('Saved job not found');
     }
     return true;
+  }
+
+  async isJobSavedAsFavorite(userId: string, jobId: string): Promise<boolean> {
+    try {
+      const keyJobSaved = `keyJobSaved-${userId}-${jobId}`;
+      const cacheData = await this.cacheManager.get<boolean>(keyJobSaved);
+      if (cacheData) return cacheData;
+      const savedJob = await this.savedJobModel.findOne({ userId, jobId });
+      await this.cacheManager.set(keyJobSaved, savedJob !== null, 1000 * 60);
+      return savedJob !== null;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
   }
 
   async getSavedJobs(

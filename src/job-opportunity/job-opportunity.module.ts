@@ -9,6 +9,7 @@ import {
 } from 'src/schemas/jobOpportunity.schema';
 import { User, UserSchema } from 'src/schemas/user.schema';
 import { SavedJob, SavedJobSchema } from 'src/schemas/savedJob.schema';
+import { JobReport, JobReportSchema } from 'src/schemas/reportJob.schema';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -16,6 +17,7 @@ import { SavedJob, SavedJobSchema } from 'src/schemas/savedJob.schema';
       { name: User.name, schema: UserSchema },
       { name: JobOpportunity.name, schema: JobOpportunitySchema },
       { name: SavedJob.name, schema: SavedJobSchema },
+      { name: JobReport.name, schema: JobReportSchema },
     ]),
   ],
   controllers: [JobOpportunityController],
