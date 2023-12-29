@@ -3,9 +3,23 @@ import { FilterRule } from '../decorators/filter.decorator';
 
 export const getFilters = (filters: Filtering[]): any => {
   let filterObject = {};
+  if(!filters) return {}
+
 
   filters.forEach((filter) => {
-    if (!filter.rule) return;
+    if (!filter.rule) return ;
+
+    if (filter.property == 'search') {
+      filterObject = {
+        ...filterObject,
+        $or: [
+          { career: { $regex: filter.value, $options: 'i' } },
+          { position: { $regex: filter.value, $options: 'i' } },
+          { company: { $regex: filter.value, $options: 'i' } },
+          { country: { $regex: filter.value, $options: 'i' } },
+        ]
+      }
+    }
 
     if (filter.property == 'user') {
       filterObject = {
@@ -43,37 +57,38 @@ export const getFilters = (filters: Filtering[]): any => {
 
       if (!maxRange) maxRange = minRange;
 
-      filterObject = {
-        ...filterObject,
-        $or: [
-          {
-            $and: [
-              { experience: { $size: 2 } },
-              {
-                'experience.0': { $lte: minRange },
-              },
-              {
-                'experience.1': { $gte: maxRange },
-              },
-            ],
-          },
-          {
-            $and: [
-              { experience: { $size: 1 } },
-              { 'experience.0': { $lte: maxRange } },
-              { 'experience.0': { $gte: minRange } },
-            ],
-          },
-        ],
-        // $and:[
-        //     {
-        //         "experience.0": { $lte: minRange}
-        //     },
-        //     {
-        //         "experience.1": { $gte: maxRange}
-        //     }
-        // ]
-      };
+      filterObject = minRange < 5 ?
+        {
+          ...filterObject,
+          $or: [
+            {
+              $and: [
+                { experience: { $size: 2 } },
+                {
+                  'experience.0': { $lte: minRange },
+                },
+                {
+                  'experience.1': { $gte: maxRange },
+                },  
+              ],
+            },
+            {
+              $and: [
+                { experience: { $size: 1 } },
+                { 'experience.0': { $lte: maxRange } },
+                { 'experience.0': { $gte: minRange } },
+              ],
+            },
+          ],   
+        } 
+        : { 
+          ...filterObject,
+          $or:[
+            {'experience.0': {$gte: minRange} },
+            {'experience.1': {$gte: minRange} }
+          ]
+          
+        } 
     }
 
     if (filter.rule == FilterRule.ISNULL) {
@@ -83,6 +98,6 @@ export const getFilters = (filters: Filtering[]): any => {
       };
     }
   });
-
+  
   return filterObject;
 };
