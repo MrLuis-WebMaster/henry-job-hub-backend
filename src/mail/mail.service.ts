@@ -45,4 +45,42 @@ export class MailService {
       console.log(error);
     }
   }
+
+  async sendNewsletter(emails: string[], latestJob: any) {
+    try {
+      await this.mailerService.sendMail({
+        to: 'frann.cedd@gmail.com',
+        from: process.env.EMAIL_FROM,
+        subject: '📰 Newsletter de HenryJobHub',
+        template: './newsletterEmail',
+        context: {
+          career: latestJob.career,
+          company: latestJob.company,
+          country: latestJob.country,
+          mode: latestJob.mode,
+          link: latestJob.link,
+          emailSupport: process.env.EMAIL_SUPPORT,
+        },
+      });
+
+      // for (const email of emails) {
+      //   await this.mailerService.sendMail({
+      //     to: email,
+      //     from: process.env.EMAIL_FROM,
+      //     subject: '📰 Newsletter de HenryJobHub',
+      //     template: './newsletterEmail',
+      //     context: {
+      //       career: latestJob.career,
+      //       company: latestJob.company,
+      //       country: latestJob.country,
+      //       mode: latestJob.mode,
+      //       link: latestJob.link,
+      //       emailSupport: process.env.EMAIL_SUPPORT,
+      //     },
+      //   });
+      // }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }
