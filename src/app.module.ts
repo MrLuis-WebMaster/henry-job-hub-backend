@@ -11,7 +11,9 @@ import { JobReportModule } from './job-report/job-report.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    MongooseModule.forRoot(process.env.DB_URL),
+    MongooseModule.forRoot(process.env.DB_URL, {
+      dbName: process.env.DB_NAME,
+    }),
     CacheModule.registerAsync({
       isGlobal: true,
       useFactory: async () => ({
