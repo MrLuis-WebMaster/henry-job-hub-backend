@@ -304,7 +304,11 @@ export class JobOpportunityService {
       const cacheData = await this.cacheManager.get<boolean>(keyJobSaved);
       if (cacheData) return cacheData;
       const savedJob = await this.savedJobModel.findOne({ userId, jobId });
-      await this.cacheManager.set(keyJobSaved, savedJob !== null, 1000 * 60);
+      await this.cacheManager.set(
+        keyJobSaved,
+        savedJob !== null,
+        60 * 60 * 24 * 7,
+      );
       return savedJob !== null;
     } catch (error) {
       console.error(error);
