@@ -157,4 +157,10 @@ export class JobOpportunityController {
       pagination,
     );
   }
+
+  @Role('admin')
+  @Post('/send-newsletter')
+  sendNewsletter(): any {
+    return this.jobOpportunityService.sendNewsletter();
+  }
 }
