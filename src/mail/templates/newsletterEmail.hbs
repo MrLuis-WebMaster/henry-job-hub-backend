@@ -1,0 +1,51 @@
+<html lang='en'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>Newsletter de HenryJobHub</title>
+    <style>
+      body { font-family: 'Arial', sans-serif; background-color: #fff3e0; color:
+      #333; margin: 0; padding: 0; } h1 { color: #009688; } p { font-size: 16px;
+      } .card { background-color: #f5f5f5; border-radius: 10px; box-shadow: 0 0
+      10px rgba(0, 0, 0, 0.1); padding: 20px; margin: 20px 0; } ul {
+      list-style-type: none; padding: 0; } li { margin-bottom: 15px; } strong {
+      color: #009688; } a { color: #007BFF; text-decoration: none; } a:hover {
+      text-decoration: underline; } footer { background-color: #f5f5f5; padding:
+      10px; margin-top: 20px; text-align: center; }
+
+    </style>
+  </head>
+  <body>
+    <div style='max-width: 600px; margin: 0 auto;'>
+      <div class='card'>
+        <h1 style='text-align: center;'>📰 Newsletter de HenryJobHub</h1>
+
+        <p>¡Hola!</p>
+
+        <p>Estamos emocionados de presentarte nuestra última oportunidad
+          laboral:</p>
+
+        <ul>
+          <li>
+            <strong>{{career}}</strong>
+            en
+            {{company}}
+            <ul>
+              <li>País: {{country}}</li>
+              <li>Modalidad: {{mode}}</li>
+              <li>Enlace: <a href='{{link}}' target='_blank'>{{link}}</a></li>
+            </ul>
+          </li>
+        </ul>
+
+        <p>Para más detalles, visita nuestro sitio web.</p>
+
+        <p>¡Gracias por ser parte de HenryJobHub!</p>
+      </div>
+
+      <footer style='color: #777; font-size: 14px;'>
+        <p>Contacto de soporte: {{emailSupport}}</p>
+      </footer>
+    </div>
+  </body>
+</html>

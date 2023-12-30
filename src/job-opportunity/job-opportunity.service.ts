@@ -29,6 +29,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { SavedJob } from 'src/schemas/savedJob.schema';
 import { JobReport } from 'src/schemas/reportJob.schema';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class JobOpportunityService {
@@ -39,6 +40,7 @@ export class JobOpportunityService {
     @InjectModel(JobReport.name) private jobReportModel: Model<JobReport>,
     @InjectModel(SavedJob.name) private savedJobModel: Model<SavedJob>,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private readonly mailService: MailService,
   ) {}
 
   async create(
@@ -360,6 +362,28 @@ export class JobOpportunityService {
       return data;
     } catch (error) {
       throw new NotFoundException(error.message);
+    }
+  }
+
+  async sendNewsletter(): Promise<boolean> {
+    try {
+      const latestJob = await this.jobOpportunityModule
+        .findOne({ visible: true })
+        .sort({ createdAt: -1 })
+        .exec();
+
+      if (!latestJob) {
+        throw new NotFoundException('No recent job opportunity found');
+      }
+
+      const allUserEmails = await this.userModel.find().select('email').exec();
+      const emails = allUserEmails.map((entry) => entry.email);
+
+      this.mailService.sendNewsletter(emails, latestJob);
+
+      return true;
+    } catch (error) {
+      throw new NotFoundException('Error processing job opportunities');
     }
   }
 }
