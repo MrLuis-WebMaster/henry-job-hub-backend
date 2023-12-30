@@ -13,7 +13,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import {
   Careers,
   JobOpportunity,
-  Mode, 
+  Mode,
 } from 'src/schemas/jobOpportunity.schema';
 import { Model } from 'mongoose';
 import { Sorting } from './decorators/sorting.decorator';
@@ -21,7 +21,7 @@ import { getSort } from './helpers/sort.helper';
 import { Filtering } from './decorators/filter.decorator';
 import { getFilters } from './helpers/filter.helper';
 import { User } from 'src/schemas/user.schema';
-import { 
+import {
   PaginationInfo,
   PaginationOptions,
 } from 'src/utils/pagination/interface/pagination.interface';

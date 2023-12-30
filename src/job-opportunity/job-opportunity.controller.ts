@@ -22,7 +22,7 @@ import { PaginationParams } from 'src/utils/pagination/decorators/pagination.dec
 
 @Controller('job-opportunity')
 export class JobOpportunityController {
-  constructor(private readonly jobOpportunityService: JobOpportunityService) { }
+  constructor(private readonly jobOpportunityService: JobOpportunityService) {}
 
   @Post()
   create(@Body() createJobOpportunityDto: JobOpportunityDto) {
@@ -33,7 +33,8 @@ export class JobOpportunityController {
   @Get()
   findAll(
     @PaginationParams() pagination: PaginationOptions,
-    @SortingParams(['country','position', 'company', 'createdAt']) sort?: Sorting,
+    @SortingParams(['country', 'position', 'company', 'createdAt'])
+    sort?: Sorting,
     @FilteringParams([
       'career',
       'position',
@@ -48,13 +49,13 @@ export class JobOpportunityController {
   ) {
     if (!sort && !filter) {
       return this.jobOpportunityService.findAll(pagination, true);
-    } 
+    }
 
     return this.jobOpportunityService.filterAndFind(
       sort,
       filter,
       pagination,
-      true, 
+      true,
     );
   }
 
@@ -62,7 +63,8 @@ export class JobOpportunityController {
   @Get('/pending-jobs')
   findAllPendingJobs(
     @PaginationParams() pagination: PaginationOptions,
-    @SortingParams(['country', 'position','company', 'createdAt']) sort?: Sorting,
+    @SortingParams(['country', 'position', 'company', 'createdAt'])
+    sort?: Sorting,
     @FilteringParams([
       'career',
       'position',
